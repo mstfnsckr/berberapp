@@ -279,19 +279,61 @@ function updateHizmetInfo() {
 }
 
 
-function generateAvailableTimes(selectedDate) {
+async function generateAvailableTimes(selectedDate) {
     const saatSelect = document.getElementById('saat');
     saatSelect.innerHTML = '<option value="">Saat seçin...</option>';
     saatSelect.disabled = false;
 
-    // Generate hours from 9:00 to 18:00
-    for (let hour = 9; hour <= 18; hour++) {
-        for (let minute = 0; minute < 60; minute += 30) {
-            const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+    try {
+        // Mevcut randevuları çek
+        const personelId = personelSelect.value;
+        const randevularResponse = await apiRequest(`/randevu?personel_id=eq.${personelId}&randevu_tarihi=gte.${selectedDate}&randevu_tarihi=lt.${new Date(selectedDate.getTime() + 24 * 60 * 60 * 1000).toISOString()}`);
+        
+        // Dolu saatleri bir set olarak sakla
+        const doluSaatler = new Set();
+        randevularResponse.forEach(randevu => {
+            const randevuTarihi = new Date(randevu.randevu_tarihi);
+            const saat = randevuTarihi.getHours().toString().padStart(2, '0') + ':' + 
+                         randevuTarihi.getMinutes().toString().padStart(2, '0');
+            doluSaatler.add(saat);
+        });
+
+        // Generate hours from 9:00 to 18:00
+        for (let hour = 9; hour <= 18; hour++) {
+            for (let minute = 0; minute < 60; minute += 30) {
+                const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+                
+                // Eğer saat doluysa gösterme
+                if (doluSaatler.has(time)) {
+                    continue;
+                }
+                
+                const option = document.createElement('option');
+                option.value = time;
+                option.textContent = time;
+                saatSelect.appendChild(option);
+            }
+        }
+        
+        // Eğer tüm saatler doluysa
+        if (saatSelect.options.length === 1) {
             const option = document.createElement('option');
-            option.value = time;
-            option.textContent = time;
+            option.value = "";
+            option.textContent = "Seçilebilir saat yok";
+            option.disabled = true;
             saatSelect.appendChild(option);
+        }
+    } catch (error) {
+        console.error('Saatler yüklenemedi:', error);
+        // Hata olursa tüm saatleri göster
+        for (let hour = 9; hour <= 18; hour++) {
+            for (let minute = 0; minute < 60; minute += 30) {
+                const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+                const option = document.createElement('option');
+                option.value = time;
+                option.textContent = time;
+                saatSelect.appendChild(option);
+            }
         }
     }
 }
