@@ -127,6 +127,7 @@ async function apiRequest(endpoint, options = {}) {
         'apikey': SUPABASE_ANON_KEY,
         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
         'Content-Type': 'application/json',
+        'Prefer': 'return=minimal',
         ...options.headers
     };
 
@@ -136,11 +137,30 @@ async function apiRequest(endpoint, options = {}) {
             headers
         });
 
+        console.log('API Response status:', response.status);
+        console.log('API Response headers:', response.headers);
+
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const errorText = await response.text();
+            console.error('API Error response:', errorText);
+            throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
         }
 
-        return await response.json();
+        // Check if response has content
+        const responseText = await response.text();
+        console.log('Raw response text:', responseText);
+        
+        if (!responseText) {
+            // Empty response is OK for POST requests
+            return { success: true };
+        }
+        
+        try {
+            return JSON.parse(responseText);
+        } catch (parseError) {
+            console.error('JSON parse error:', parseError);
+            throw new Error(`JSON parsing failed: ${parseError.message}`);
+        }
     } catch (error) {
         console.error('API Error:', error);
         throw error;
