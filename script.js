@@ -288,10 +288,25 @@ async function handleSubmit(e) {
     
     try {
         const formData = getFormData();
-        await createAppointment(formData);
+        console.log('Form verileri:', formData);
+        
+        const result = await createAppointment(formData);
+        console.log('Başarılı sonuç:', result);
+        
         showSuccess(formData);
     } catch (error) {
-        showError('Randevu talebi oluşturulamadı. Lütfen tekrar deneyin.');
+        console.error('Detaylı hata:', error);
+        
+        // Daha spesifik hata mesajları
+        if (error.message.includes('401') || error.message.includes('403')) {
+            showError('API yetkilendirme hatası. Lütfen sayfayı yenileyin.');
+        } else if (error.message.includes('400')) {
+            showError('Geçersiz veri. Lütfen tüm alanları kontrol edin.');
+        } else if (error.message.includes('500')) {
+            showError('Sunucu hatası. Lütfen biraz sonra tekrar deneyin.');
+        } else {
+            showError(`Randevu talebi oluşturulamadı: ${error.message}`);
+        }
     } finally {
         setLoading(false);
     }
@@ -350,10 +365,19 @@ async function createAppointment(data) {
         durum: 'beklemede'
     };
 
-    return await apiRequest('/randevu', {
-        method: 'POST',
-        body: JSON.stringify(payload)
-    });
+    console.log('Gönderilen veri:', payload);
+    
+    try {
+        const response = await apiRequest('/randevu', {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+        console.log('API yanıtı:', response);
+        return response;
+    } catch (error) {
+        console.error('Randevu oluşturma hatası:', error);
+        throw error;
+    }
 }
 
 function showSuccess(formData) {
