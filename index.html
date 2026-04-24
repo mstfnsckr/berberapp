@@ -40,10 +40,21 @@
                         </div>
                     </div>
 
-                    <!-- Tarih ve Saat Seçimi -->
+                    <!-- Tarih Seçimi -->
                     <div class="form-group">
-                        <label for="tarih">Tarih Seçin</label>
-                        <input type="date" id="tarih" name="tarih" required>
+                        <label>Tarih Seçin</label>
+                        <div class="date-selectors">
+                            <select id="gun" name="gun" required>
+                                <option value="">Gün</option>
+                            </select>
+                            <select id="ay" name="ay" required>
+                                <option value="">Ay</option>
+                            </select>
+                            <select id="yil" name="yil" required>
+                                <option value="">Yıl</option>
+                            </select>
+                        </div>
+                        <input type="hidden" id="tarih" name="tarih" required>
                     </div>
 
                     <div class="form-group">

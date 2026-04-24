@@ -232,6 +232,28 @@ header p {
     color: #ef4444;
 }
 
+.date-selectors {
+    display: flex;
+    gap: 10px;
+}
+
+.date-selectors select {
+    flex: 1;
+    padding: 15px;
+    border: 2px solid #e1e8ed;
+    border-radius: 12px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+}
+
+.date-selectors select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    background: #fff;
+}
+
 .hizmet-info {
     background: #f8f9fa;
     padding: 15px;

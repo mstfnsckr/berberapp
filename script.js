@@ -11,6 +11,9 @@ let selectedHizmet = null;
 // DOM Elements
 const personelSelect = document.getElementById('personel');
 const hizmetSelect = document.getElementById('hizmet');
+const gunSelect = document.getElementById('gun');
+const aySelect = document.getElementById('ay');
+const yilSelect = document.getElementById('yil');
 const tarihInput = document.getElementById('tarih');
 const saatSelect = document.getElementById('saat');
 const appointmentForm = document.getElementById('appointmentForm');
@@ -26,21 +29,95 @@ document.addEventListener('DOMContentLoaded', function() {
 function initializeApp() {
     loadPersonel();
     setupEventListeners();
-    setMinDate();
+    initializeDateSelectors();
 }
 
 function setupEventListeners() {
     personelSelect.addEventListener('change', handlePersonelChange);
-    tarihInput.addEventListener('change', handleTarihChange);
+    gunSelect.addEventListener('change', handleDateChange);
+    aySelect.addEventListener('change', handleDateChange);
+    yilSelect.addEventListener('change', handleDateChange);
     appointmentForm.addEventListener('submit', handleSubmit);
 }
 
-function setMinDate() {
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const minDate = tomorrow.toISOString().split('T')[0];
-    tarihInput.min = minDate;
+function initializeDateSelectors() {
+    // Ayları doldur
+    const aylar = [
+        'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+        'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+    ];
+    
+    aylar.forEach((ay, index) => {
+        const option = document.createElement('option');
+        option.value = index + 1;
+        option.textContent = ay;
+        aySelect.appendChild(option);
+    });
+    
+    // Yılları doldur (2024-2030)
+    const currentYear = new Date().getFullYear();
+    for (let year = currentYear; year <= currentYear + 6; year++) {
+        const option = document.createElement('option');
+        option.value = year;
+        option.textContent = year;
+        yilSelect.appendChild(option);
+    }
+    
+    // Güncel yılı seç
+    yilSelect.value = currentYear;
+    
+    // Ay değiştiğinde günleri güncelle
+    aySelect.addEventListener('change', updateGunler);
+    yilSelect.addEventListener('change', updateGunler);
+}
+
+function updateGunler() {
+    const ay = parseInt(aySelect.value);
+    const yil = parseInt(yilSelect.value);
+    
+    if (!ay || !yil) {
+        gunSelect.innerHTML = '<option value="">Gün</option>';
+        return;
+    }
+    
+    const gunSayisi = new Date(yil, ay, 0).getDate();
+    const bugun = new Date();
+    const minDate = new Date(bugun.getFullYear(), bugun.getMonth(), bugun.getDate() + 1);
+    const secilenTarih = new Date(yil, ay - 1, 1);
+    
+    gunSelect.innerHTML = '<option value="">Gün</option>';
+    
+    for (let gun = 1; gun <= gunSayisi; gun++) {
+        const kontrolTarih = new Date(yil, ay - 1, gun);
+        
+        // Geçmiş tarihleri engelle
+        if (kontrolTarih >= minDate) {
+            const option = document.createElement('option');
+            option.value = gun;
+            option.textContent = gun;
+            gunSelect.appendChild(option);
+        }
+    }
+}
+
+function handleDateChange() {
+    const gun = gunSelect.value;
+    const ay = aySelect.value;
+    const yil = yilSelect.value;
+    
+    if (gun && ay && yil) {
+        // YYYY-MM-DD formatında tarih oluştur
+        const formattedGun = gun.padStart(2, '0');
+        const formattedAy = ay.padStart(2, '0');
+        tarihInput.value = `${yil}-${formattedAy}-${formattedGun}`;
+        
+        if (selectedHizmet) {
+            generateAvailableTimes(tarihInput.value);
+        }
+    } else {
+        tarihInput.value = '';
+        resetSaatSelect();
+    }
 }
 
 // API Functions
@@ -181,17 +258,6 @@ function updateHizmetInfo() {
     }
 }
 
-// Handle Tarih Change
-function handleTarihChange() {
-    const selectedDate = tarihInput.value;
-    
-    if (!selectedDate || !selectedHizmet) {
-        resetSaatSelect();
-        return;
-    }
-
-    generateAvailableTimes(selectedDate);
-}
 
 function generateAvailableTimes(selectedDate) {
     const saatSelect = document.getElementById('saat');
@@ -234,13 +300,16 @@ async function handleSubmit(e) {
 function validateForm() {
     const personelId = personelSelect.value;
     const hizmetId = hizmetSelect.value;
+    const gun = gunSelect.value;
+    const ay = aySelect.value;
+    const yil = yilSelect.value;
     const tarih = tarihInput.value;
     const saat = saatSelect.value;
     const ad = document.getElementById('ad').value.trim();
     const soyad = document.getElementById('soyad').value.trim();
     const telefon = document.getElementById('telefon').value.trim();
 
-    if (!personelId || !hizmetId || !tarih || !saat || !ad || !soyad || !telefon) {
+    if (!personelId || !hizmetId || !gun || !ay || !yil || !tarih || !saat || !ad || !soyad || !telefon) {
         showError('Lütfen tüm alanları doldurun.');
         return false;
     }
