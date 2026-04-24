@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Berber Randevu Sistemi</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="logo">
+                    <span class="icon">✂️</span>
+                    <h1>Berber Randevu</h1>
+                </div>
+                <p>Online randevu talebi oluşturun</p>
+            </div>
+        </header>
+
+        <main>
+            <div class="form-container">
+                <h2>Randevu Talebi</h2>
+                <form id="appointmentForm">
+                    <!-- Personel Seçimi -->
+                    <div class="form-group">
+                        <label for="personel">Personel Seçin</label>
+                        <select id="personel" name="personel" required>
+                            <option value="">Personel seçin...</option>
+                        </select>
+                    </div>
+
+                    <!-- Hizmet Seçimi -->
+                    <div class="form-group">
+                        <label for="hizmet">Hizmet Seçin</label>
+                        <div id="hizmetContainer">
+                            <select id="hizmet" name="hizmet" required disabled>
+                                <option value="">Önce personel seçin...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Tarih ve Saat Seçimi -->
+                    <div class="form-group">
+                        <label for="tarih">Tarih Seçin</label>
+                        <input type="date" id="tarih" name="tarih" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="saat">Saat Seçin</label>
+                        <select id="saat" name="saat" required disabled>
+                            <option value="">Önce tarih seçin...</option>
+                        </select>
+                    </div>
+
+                    <!-- Müşteri Bilgileri -->
+                    <div class="form-group">
+                        <label for="ad">Adınız</label>
+                        <input type="text" id="ad" name="ad" required placeholder="Adınızı girin">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="soyad">Soyadınız</label>
+                        <input type="text" id="soyad" name="soyad" required placeholder="Soyadınızı girin">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="telefon">Telefon</label>
+                        <input type="tel" id="telefon" name="telefon" required placeholder="555 444 22 11">
+                    </div>
+
+                    <!-- Butonlar -->
+                    <div class="button-group">
+                        <button type="submit" class="btn-primary" id="submitBtn">
+                            <span class="btn-text">Randevu Talebi Oluştur</span>
+                            <span class="btn-loading" style="display: none;">Gönderiliyor...</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Başarı Mesajı -->
+            <div id="successMessage" class="message success" style="display: none;">
+                <div class="message-content">
+                    <span class="message-icon">✅</span>
+                    <h3>Randevu Talebiniz Alınmıştır</h3>
+                    <p>Sayın <span id="musteriAd"></span>, <span id="hizmetAd"></span> işlemi için <span id="tarihSaat"></span> randevu talebiniz başarıyla alınmıştır.</p>
+                    <p>Berberinizin onayı beklenmektedir. Onaylandığında WhatsApp üzerinden bilgilendirileceksiniz.</p>
+                    <p>Teşekkür ederiz!</p>
+                </div>
+            </div>
+
+            <!-- Hata Mesajı -->
+            <div id="errorMessage" class="message error" style="display: none;">
+                <div class="message-content">
+                    <span class="message-icon">❌</span>
+                    <h3>Hata Oluştu</h3>
+                    <p id="errorText">Randevu talebi oluşturulamadı. Lütfen tekrar deneyin.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
