@@ -129,6 +129,9 @@ function populateHizmetSelect() {
 
     // Add hizmet info display
     addHizmetInfo();
+    
+    // Add hizmet change listener
+    hizmetSelect.addEventListener('change', handleHizmetChange);
 }
 
 function addHizmetInfo() {
@@ -145,6 +148,18 @@ function addHizmetInfo() {
     hizmetSelect.parentNode.appendChild(infoDiv);
 
     hizmetSelect.addEventListener('change', updateHizmetInfo);
+}
+
+function handleHizmetChange() {
+    const hizmetId = hizmetSelect.value;
+    
+    if (hizmetId) {
+        selectedHizmet = hizmetData.find(h => h.id === hizmetId);
+    } else {
+        selectedHizmet = null;
+    }
+    
+    updateHizmetInfo();
 }
 
 function updateHizmetInfo() {
